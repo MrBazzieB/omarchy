@@ -42,6 +42,10 @@ Hyprland works great with multiple screens. Read more about how to lay them out 
 
 You can also checkout [Hyprmon](https://github.com/erans/hyprmon/), if you'd like a TUI to help you with the positioning of multiple screens.
 
+Workspace numbers are shared across monitors by default, so `Super + 1` always means the same workspace and switching to it brings you to whichever screen that workspace is on. Turn on separate workspaces from _Trigger > Appearance > Separate Workspaces_, or with `omarchy toggle monitor-workspaces`, and each monitor keeps its own workspaces 1–10. `Super + number`, `Super + Tab`, and `Super + scroll` then stay on the monitor you are using. The laptop screen keeps the familiar numbers. A second screen still shows 1–10, stored internally as 11–20, and the numbers stick to that screen's description when you unplug it and plug it back in.
+
+Turning separate workspaces off stops the per-monitor keys and the per-monitor numbering in the bar. It does not move windows back to the shared numbers, so a window that lived on workspace 6 of the second screen is still on internal workspace 16 until you turn separate workspaces on again or move the window yourself. `Super + Shift + Alt + arrows` still tries to send a whole workspace to another monitor, and the pin that keeps each number on its screen will fight that.
+
 ### Controlling brightness
 
 Monitor brightness is controlled by the dedicated function keys for brightness up/down. If you hold down shift while pressing these, you'll go to maximum or minimum brightness. The keys control the display you're focused on, so external monitors that speak DDC/CI are adjusted the same way as the laptop screen.
