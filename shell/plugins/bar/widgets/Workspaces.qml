@@ -17,6 +17,10 @@ BarWidget {
   property var slotsByDescription: ({})
   property int slotCount: 10
   property int screenRevision: 0
+  // The window's screen, remembered after the bar has been placed. Reading
+  // QsWindow while the row's size is being measured loops, and walking parents
+  // never reaches the panel, so a click would aim at workspaces 1–10.
+  property var hostScreenObject: null
 
   function stateHome() {
     var home = Quickshell.env("HOME") || ""
@@ -51,7 +55,19 @@ BarWidget {
   // The bar's PanelWindow is an ancestor and already knows its screen.
   // Asking QsWindow for the window during a size binding loops, because the
   // window attachment lays this item out to learn its implicit size.
+  function rememberScreen() {
+    var attached = root.QsWindow
+    var window = attached ? attached.window : null
+    var screen = window ? window.screen : null
+    if (!screen) return
+    var changed = root.hostScreenObject !== screen
+    root.hostScreenObject = screen
+    if (changed) root.screenRevision++
+  }
+
   function hostScreen() {
+    if (root.hostScreenObject) return root.hostScreenObject
+
     var item = root
     var guard = 0
     while (item && guard < 24) {
@@ -228,7 +244,7 @@ BarWidget {
 
   Component.onCompleted: {
     refresh()
-    screenRevision++
+    Qt.callLater(root.rememberScreen)
   }
 
   Connections {
@@ -269,13 +285,22 @@ BarWidget {
   // Read the reactive sources here so the row follows workspace, focus, and
   // toggle changes. The numbers themselves are computed in workspaceIds().
   readonly property var shownIds: {
+    var screen = hostScreenObject
     var workspaces = Hyprland.workspaces.values
     var monitors = Hyprland.monitors.values
     var focused = Hyprland.focusedMonitor
     var enabled = separate
     var slots = slotsByDescription
     var revision = screenRevision
-    return workspaceIds(workspaces, monitors, focused, enabled, slots, revision)
+    return workspaceIds(workspaces, monitors, focused, enabled, slots, revision, screen)
+  }
+
+  // The panel may not own the widget on the first completion.
+  Timer {
+    interval: 50
+    running: root.hostScreenObject === null
+    repeat: false
+    onTriggered: root.rememberScreen()
   }
 
   readonly property real trailingGap: root.vertical ? 0 : Style.spaceReal(1.5)
