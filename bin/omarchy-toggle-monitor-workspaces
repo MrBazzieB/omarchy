@@ -27,12 +27,14 @@ case $action in
     ;;
   off)
     disable_state
+    omarchy-hyprland-monitor-scaling --clear-separate-scales
     omarchy-hyprland-toggle monitor-workspaces off
     omarchy-notification-send -g 󰍹 "$(omarchy-i18n monitorWorkspaces.sharedTitle)" "$(omarchy-i18n monitorWorkspaces.sharedBody)"
     ;;
   toggle)
     if omarchy-hyprland-toggle-enabled monitor-workspaces; then
       disable_state
+      omarchy-hyprland-monitor-scaling --clear-separate-scales
       omarchy-hyprland-toggle monitor-workspaces off
       omarchy-notification-send -g 󰍹 "$(omarchy-i18n monitorWorkspaces.sharedTitle)" "$(omarchy-i18n monitorWorkspaces.sharedBody)"
     else
